@@ -22,7 +22,24 @@ export function useInventory() {
 
   useEffect(() => { void refreshProducts(); }, [refreshProducts]);
 
+  const addProduct = async (item: ProductFormData): Promise<MutationResult> => {
+    try {
+      const result = await inventoryApi.createProduct(item);
+      if (result.success && result.product) {
+        setProducts((prev) => [...prev, result.product!]);
+        setGeneralError(null);
+        setSuccessMessage(`Producto ${result.product.code} registrado correctamente.`);
+      }
+      return result;
+    } catch (error) {
+      return { success: false, message: error instanceof Error ? error.message : 'Error de conexión.' };
+    }
+  };
+
   const addProducts = async (items: ProductFormData[]): Promise<MutationResult> => {
+    if (items.length === 1) {
+      return addProduct(items[0]);
+    }
     try {
       const result = await inventoryApi.createProducts(items);
       if (result.success && result.products) {
@@ -50,9 +67,39 @@ export function useInventory() {
     }
   };
 
+  const updateQuantity = async (product: Product, newQuantity: number): Promise<boolean> => {
+    if (newQuantity < 1) return false;
+    const prevProducts = products;
+    // Optimistic update
+    setProducts((prev) =>
+      prev.map((p) => (p.code === product.code ? { ...p, quantity: newQuantity } : p))
+    );
+
+    try {
+      const result = await inventoryApi.updateProduct(product.code, {
+        code: product.code,
+        description: product.description,
+        price: product.price.toFixed(2),
+        quantity: String(newQuantity),
+      });
+
+      if (!result.success) {
+        setProducts(prevProducts);
+        setGeneralError(result.message || 'No se pudo actualizar la cantidad.');
+        return false;
+      }
+      setGeneralError(null);
+      return true;
+    } catch (error) {
+      setProducts(prevProducts);
+      setGeneralError(error instanceof Error ? error.message : 'Error al actualizar la cantidad.');
+      return false;
+    }
+  };
+
   return {
     products, isLoading, generalError, successMessage,
-    addProducts, editProduct, refreshProducts,
+    addProduct, addProducts, editProduct, updateQuantity, refreshProducts,
     clearSuccessMessage: () => setSuccessMessage(null),
   };
 }

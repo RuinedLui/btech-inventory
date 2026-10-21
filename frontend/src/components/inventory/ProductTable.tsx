@@ -1,4 +1,4 @@
-import { Package, CheckSquare, Square, Pencil, Plus } from 'lucide-react';
+import { Package, CheckSquare, Square, Pencil, Plus, Minus } from 'lucide-react';
 import { Product } from '../../types/inventory.types';
 
 interface ProductTableProps {
@@ -9,12 +9,20 @@ interface ProductTableProps {
   onToggleSelectAll: () => void;
   onAdd: () => void;
   onEdit: (product: Product) => void;
+  onUpdateQuantity?: (product: Product, newQuantity: number) => void;
 }
 
 const formatCurrency = (value: number): string => `$${value.toFixed(2)}`;
 
 export function ProductTable({
-  products, selectedCodes, isLoading, onToggleSelect, onToggleSelectAll, onAdd, onEdit,
+  products,
+  selectedCodes,
+  isLoading,
+  onToggleSelect,
+  onToggleSelectAll,
+  onAdd,
+  onEdit,
+  onUpdateQuantity,
 }: ProductTableProps) {
   const allSelected = products.length > 0 && selectedCodes.length === products.length;
 
@@ -33,22 +41,37 @@ export function ProductTable({
             </button>
           )}
           <button type="button" className="btn btn-primary btn-sm" onClick={onAdd}>
-            <Plus size={16} /> <span>Agregar productos</span>
+            <Plus size={16} /> <span>Agregar producto</span>
           </button>
         </div>
       </div>
       <div className="card-body" style={{ padding: 0 }}>
         {isLoading ? (
-          <div className="state-loading"><div className="spinner" /><span>Cargando productos...</span></div>
+          <div className="state-loading">
+            <div className="spinner" />
+            <span>Cargando productos...</span>
+          </div>
         ) : products.length === 0 ? (
-          <div className="state-empty"><Package size={36} color="#94a3b8" /><p>No hay productos registrados.</p></div>
+          <div className="state-empty">
+            <Package size={36} color="#94a3b8" />
+            <p>No hay productos registrados.</p>
+          </div>
         ) : (
           <div className="table-responsive">
             <table className="data-table">
               <thead>
                 <tr>
-                  <th className="checkbox-cell"><input type="checkbox" className="custom-checkbox" checked={allSelected} onChange={onToggleSelectAll} aria-label="Seleccionar todos" /></th>
-                  <th>Código</th><th>Descripción</th>
+                  <th className="checkbox-cell">
+                    <input
+                      type="checkbox"
+                      className="custom-checkbox"
+                      checked={allSelected}
+                      onChange={onToggleSelectAll}
+                      aria-label="Seleccionar todos"
+                    />
+                  </th>
+                  <th>Código</th>
+                  <th>Descripción</th>
                   <th className="cell-numeric">Cantidad</th>
                   <th className="cell-numeric">Precio unitario</th>
                   <th className="cell-numeric">Subtotal</th>
@@ -62,15 +85,62 @@ export function ProductTable({
                   return (
                     <tr key={product.code} className={selected ? 'row-selected' : ''}>
                       <td className="checkbox-cell">
-                        <input type="checkbox" className="custom-checkbox" checked={selected} onChange={() => onToggleSelect(product.code)} aria-label={`Seleccionar ${product.description}`} />
+                        <input
+                          type="checkbox"
+                          className="custom-checkbox"
+                          checked={selected}
+                          onChange={() => onToggleSelect(product.code)}
+                          aria-label={`Seleccionar ${product.description}`}
+                        />
                       </td>
-                      <td><span className="code-pill">{product.code}</span></td>
-                      <td><strong>{product.description}</strong></td>
-                      <td className="cell-numeric">{product.quantity}</td>
+                      <td>
+                        <span className="code-pill">{product.code}</span>
+                      </td>
+                      <td>
+                        <strong>{product.description}</strong>
+                      </td>
+                      <td className="cell-numeric">
+                        {onUpdateQuantity ? (
+                          <div className="table-quantity-control">
+                            <button
+                              type="button"
+                              className="btn-quantity-table"
+                              onClick={() => onUpdateQuantity(product, product.quantity - 1)}
+                              disabled={product.quantity <= 1}
+                              title="Disminuir cantidad"
+                              aria-label={`Disminuir cantidad de ${product.description}`}
+                            >
+                              <Minus size={12} />
+                            </button>
+                            <span className="table-quantity-number">{product.quantity}</span>
+                            <button
+                              type="button"
+                              className="btn-quantity-table"
+                              onClick={() => onUpdateQuantity(product, product.quantity + 1)}
+                              title="Aumentar cantidad"
+                              aria-label={`Aumentar cantidad de ${product.description}`}
+                            >
+                              <Plus size={12} />
+                            </button>
+                          </div>
+                        ) : (
+                          product.quantity
+                        )}
+                      </td>
                       <td className="cell-numeric">{formatCurrency(product.price)}</td>
-                      <td className="cell-numeric"><strong>{formatCurrency(lineTotalCents / 100)}</strong></td>
+                      <td className="cell-numeric">
+                        <strong>{formatCurrency(lineTotalCents / 100)}</strong>
+                      </td>
                       <td className="actions-cell">
-                        <button className="btn-icon-table" type="button" onClick={() => onEdit(product)} title={`Editar ${product.description}`} aria-label={`Editar ${product.description}`}><Pencil size={16}/></button>
+                        <button
+                          className="btn-icon-table"
+                          type="button"
+                          onClick={() => onEdit(product)}
+                          title={`Editar ${product.description}`}
+                          aria-label={`Editar ${product.description}`}
+                        >
+                          <Pencil size={16} />
+                        </button>
                       </td>
                     </tr>
                   );

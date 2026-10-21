@@ -18,6 +18,23 @@ export const inventoryApi = {
     return readResponse<Product[]>(response);
   },
 
+  async createProduct(product: ProductFormData): Promise<MutationResult> {
+    const response = await fetch(`${BASE_URL}/products`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(product),
+    });
+    const data = await readResponse<{ message?: string; product?: Product; errors?: Record<string, string> }>(response);
+    if (!response.ok) {
+      return {
+        success: false,
+        message: data.message || 'No se pudo registrar el producto.',
+        errors: data.errors,
+      };
+    }
+    return { ...data, success: true };
+  },
+
   async createProducts(products: ProductFormData[]): Promise<MutationResult> {
     const response = await fetch(`${BASE_URL}/products/batch`, {
       method: 'POST',

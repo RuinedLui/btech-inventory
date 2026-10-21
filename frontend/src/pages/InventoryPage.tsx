@@ -10,19 +10,47 @@ import { Product } from '../types/inventory.types';
 
 export function InventoryPage() {
   const {
-    products, isLoading, generalError, successMessage,
-    addProducts, editProduct, clearSuccessMessage,
+    products,
+    isLoading,
+    generalError,
+    successMessage,
+    addProduct,
+    editProduct,
+    updateQuantity,
+    clearSuccessMessage,
   } = useInventory();
+
   const {
-    selectedCodes, applyDiscount, summary, isCalculating, summaryError,
-    toggleProductSelection, toggleSelectAll, toggleApplyDiscount, renameSelectedCode,
+    selectedCodes,
+    applyDiscount,
+    summary,
+    isCalculating,
+    summaryError,
+    toggleProductSelection,
+    toggleSelectAll,
+    toggleApplyDiscount,
+    renameSelectedCode,
   } = useInventorySummary(products);
+
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
 
-  const closeModal = useCallback(() => { setModalOpen(false); setEditingProduct(undefined); }, []);
-  const openCreate = () => { clearSuccessMessage(); setEditingProduct(undefined); setModalOpen(true); };
-  const openEdit = (product: Product) => { clearSuccessMessage(); setEditingProduct(product); setModalOpen(true); };
+  const closeModal = useCallback(() => {
+    setModalOpen(false);
+    setEditingProduct(undefined);
+  }, []);
+
+  const openCreate = () => {
+    clearSuccessMessage();
+    setEditingProduct(undefined);
+    setModalOpen(true);
+  };
+
+  const openEdit = (product: Product) => {
+    clearSuccessMessage();
+    setEditingProduct(product);
+    setModalOpen(true);
+  };
 
   return (
     <div className="app-container">
@@ -40,6 +68,7 @@ export function InventoryPage() {
             onToggleSelectAll={toggleSelectAll}
             onAdd={openCreate}
             onEdit={openEdit}
+            onUpdateQuantity={updateQuantity}
           />
         </section>
         <aside className="sidebar-column" aria-label="Resumen financiero">
@@ -57,7 +86,7 @@ export function InventoryPage() {
         <ProductModal
           product={editingProduct}
           onClose={closeModal}
-          onCreate={addProducts}
+          onCreate={addProduct}
           onUpdate={editProduct}
           onUpdated={renameSelectedCode}
         />
