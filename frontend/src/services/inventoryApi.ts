@@ -2,8 +2,9 @@ import {
   InventorySummary, MutationResult, Product, ProductFormData, SummaryRequestDTO, BatchValidationErrors,
 } from '../types/inventory.types';
 
-const API_URL = (import.meta.env.VITE_API_URL as string | undefined)?.trim() || 'https://btech-inventory-production.up.railway.app/api';
-const BASE_URL = API_URL.replace(/\/+$/, '');
+const RAW_URL = (import.meta.env.VITE_API_URL as string | undefined)?.trim() || 'https://btech-inventory-production.up.railway.app/api';
+const CLEAN_URL = RAW_URL.replace(/\/+$/, '');
+const BASE_URL = CLEAN_URL.endsWith('/api') ? CLEAN_URL : `${CLEAN_URL}/api`;
 
 async function readResponse<T>(response: Response): Promise<T> {
   const data = await response.json();

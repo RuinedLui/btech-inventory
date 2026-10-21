@@ -62,7 +62,9 @@ export function createApp(): Application {
   const repository = new InMemoryInventoryRepository();
   const service = new InventoryService(repository, new SelectedPercentageDiscountStrategy(0.05));
   const controller = new InventoryController(service);
-  app.use('/api', createInventoryRouter(controller));
+  const router = createInventoryRouter(controller);
+  app.use('/api', router);
+  app.use('/', router);
 
   return app;
 }
