@@ -10,7 +10,10 @@
     "dev": "concurrently -k -n BACKEND,FRONTEND -c blue,green \"pnpm --filter btech-inventory-backend dev\" \"pnpm --filter btech-inventory-frontend dev\"",
     "dev:backend": "pnpm --filter btech-inventory-backend dev",
     "dev:frontend": "pnpm --filter btech-inventory-frontend dev",
-    "build": "pnpm -r build"
+    "build": "pnpm -r build",
+    "build:backend": "pnpm --filter btech-inventory-backend build",
+    "start": "pnpm --filter btech-inventory-backend start",
+    "start:backend": "pnpm --filter btech-inventory-backend start"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

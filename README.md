@@ -174,3 +174,22 @@ Limitaciones:
 - Altas y ediciones se conservan solo mientras el proceso está activo; al reiniciar el backend (incluido el reinicio automático de `tsx watch` al guardar archivos) el inventario vuelve a los cinco productos iniciales.
 - El estado no se comparte entre varias instancias del servidor.
 - No hay autenticación ni control de concurrencia.
+
+## Despliegue en Railway (Backend)
+
+El repositorio incluye la configuración `railway.json` para compilar y ejecutar exclusivamente el backend desde el monorepo pnpm.
+
+Configuración del servicio en Railway:
+
+- **Root Directory:** `/` (o dejarlo vacío / raíz del repositorio). *No asignar `/backend` para que pnpm pueda resolver `pnpm-workspace.yaml` y `pnpm-lock.yaml`*.
+- **Build Command:** `pnpm --filter btech-inventory-backend build` (o `pnpm run build:backend`).
+- **Start Command:** `pnpm --filter btech-inventory-backend start` (o `pnpm start`).
+- **Healthcheck Path:** `/health`.
+
+Variables de entorno:
+
+| Variable | Descripción | Valor |
+|---|---|---|
+| `PORT` | Asignado automáticamente por Railway. | Automático (ej. `3001`, `8080`) |
+| `FRONTEND_URL` | URL de la aplicación frontend en Netlify para CORS. | `https://tu-app.netlify.app` (opcional, permite `*.netlify.app` por defecto) |
+

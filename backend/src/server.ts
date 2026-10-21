@@ -1,10 +1,11 @@
 import { createApp } from './app.js';
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3001;
+const HOST = process.env.HOST || '0.0.0.0';
 const app = createApp();
 
-const server = app.listen(PORT, () => {
-  console.log(`B-TECH Inventory API: http://localhost:${PORT}`);
+const server = app.listen(PORT, HOST, () => {
+  console.log(`B-TECH Inventory API listening on ${HOST}:${PORT}`);
 });
 
 server.on('error', (error: NodeJS.ErrnoException) => {
