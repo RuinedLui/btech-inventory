@@ -2,7 +2,8 @@ import {
   InventorySummary, MutationResult, Product, ProductFormData, SummaryRequestDTO, BatchValidationErrors,
 } from '../types/inventory.types';
 
-const BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const API_URL = (import.meta.env.VITE_API_URL as string | undefined)?.trim() || 'https://btech-inventory-production.up.railway.app/api';
+const BASE_URL = API_URL.replace(/\/+$/, '');
 
 async function readResponse<T>(response: Response): Promise<T> {
   const data = await response.json();
